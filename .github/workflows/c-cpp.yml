@@ -1,4 +1,4 @@
-name: C/C++ CI
+name: C/C++ CI for State Machine
 
 on:
   push:
@@ -12,12 +12,39 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+   
     - uses: actions/checkout@v3
-    - name: configure
-      run: ./configure
-    - name: make
+
+    
+    - name: Install dependencies
+      run: sudo apt-get update && sudo apt-get install -y build-essential gcc g++ make
+
+    # Generate configure script if needed
+    - name: Generate configure script
+      run: |
+        if [ -f configure.ac ]; then
+          autoreconf -i
+        fi
+
+    # Run the configure script if it exists
+    - name: Configure
+      run: |
+        if [ -f configure ]; then
+          ./configure
+        fi
+
+    # Build the project
+    - name: Build
       run: make
-    - name: make check
+
+    # Run tests (if you have any, otherwise modify/remove this section)
+    - name: Run tests
       run: make check
-    - name: make distcheck
+
+    # Perform distribution check (optional, if you want to validate distribution builds)
+    - name: Check distribution
       run: make distcheck
+
+    # Run the main program with test input 
+    - name: Run State Machine Program
+      run: ./state_machine < test_input.txt
